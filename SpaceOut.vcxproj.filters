@@ -127,9 +127,6 @@
     <Image Include="..\..\..\..\..\Downloads\deneme2.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\..\..\..\Downloads\wall.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\..\..\..\..\downloads\bitmap4.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -140,9 +137,6 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\bitmap7.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\wall.bmp">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="..\..\..\bitmap8.bmp">
@@ -158,6 +152,36 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="bitmap9.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap10.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="wall.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="idle.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="rightMove.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="leftMove.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="boss.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Desktop\suruken.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Desktop\wand.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Desktop\su_topu.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="heart.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

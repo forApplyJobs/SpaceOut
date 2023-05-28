@@ -48,15 +48,27 @@ IDB_GAMEOVER            BITMAP                  "GameOver.bmp"
 
 IDB_BITMAP1             BITMAP                  "bitmap1.bmp"
 
-IDB_BITMAP3             BITMAP                  "C:\\Users\\bilge\\downloads\\wall.bmp"
+IDB_BITMAP3             BITMAP                  "wall.bmp"
 
-IDB_IDLE                BITMAP                  "bitmap7.bmp"
+IDB_IDLE                BITMAP                  "idle.bmp"
 
-IDB_RIGHTMOVE           BITMAP                  "bitmap8.bmp"
+IDB_RIGHTMOVE           BITMAP                  "rightMove.bmp"
 
-IDB_LEFTMOVE            BITMAP                  "bitmap9.bmp"
+IDB_LEFTMOVE            BITMAP                  "leftMove.bmp"
 
-IDB_BOSS                BITMAP                  "c:\\users\\bilge\\downloads\\bitmap8.bmp"
+IDB_BOSS                BITMAP                  "boss.bmp"
+
+IDB_BITMAP10            BITMAP                  "bitmap10.bmp"
+
+IDB_BITMAP2				BITMAP                  "wand.bmp"
+
+IDB_SU					BITMAP                  "su_topu.bmp"
+
+IDB_SURUKEN				BITMAP                  "suruken.bmp"
+
+IDB_AVATAR				BITMAP                  "avatar.bmp"
+
+IDB_HEART				BITMAP                  "heart.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,5 +89,4 @@ IDW_SMEXPLODE           WAVE                    "SmExplode.wav"
 IDW_LGEXPLODE           WAVE                    "LgExplode.wav"
 
 IDW_GAMEOVER            WAVE                    "GameOver.wav"
-
 

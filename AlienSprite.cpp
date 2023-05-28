@@ -73,22 +73,31 @@ Sprite* AlienSprite::AddSprite()
           // Blobbo missile
           pSprite = new Sprite(_pBMissileBitmap, rcBounds, BA_DIE);
           pSprite->SetVelocity(deltaX / magnitude * speed, deltaY / magnitude * speed);
+          pSprite->SetPosition(rcPos.left + (GetWidth() / 2), rcPos.bottom);
       }
       else if (GetBitmap() == _pJellyBitmap)
       {
           // Jelly missile
           pSprite = new Sprite(_pJMissileBitmap, rcBounds, BA_DIE);
           pSprite->SetVelocity(deltaX / magnitude * speed, deltaY / magnitude * speed);
+          pSprite->SetPosition(rcPos.left + (GetWidth() / 2), rcPos.bottom);
       }
-      else
+      else if(GetBitmap() == _pTimmyBitmap)
       {
           // Timmy missile
           pSprite = new Sprite(_pTMissileBitmap, rcBounds, BA_DIE);
           pSprite->SetVelocity(deltaX / magnitude * speed, deltaY / magnitude * speed);
+          pSprite->SetPosition(rcPos.left + (GetWidth() / 2), rcPos.bottom);
+      }
+      else//boss
+      {
+          pSprite = new Sprite(_pTMissileBitmap, rcBounds, BA_DIE);
+          pSprite->SetVelocity(deltaX / magnitude * speed, deltaY / magnitude * speed);
+          pSprite->SetPosition(rcPos.left + (GetWidth() / 2), rcPos.bottom + (GetHeight() / 2));
       }
 
       // Set the missile sprite's position and return it
-      pSprite->SetPosition(rcPos.left + (GetWidth() / 2), rcPos.bottom);
+      
   }
   return pSprite;
 }

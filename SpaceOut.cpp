@@ -33,7 +33,7 @@ BOOL GameInitialize(HINSTANCE hInstance)
 void GameStart(HWND hWindow)
 {
   // Seed the random number generator
-  srand(22);
+  srand(GetTickCount());
 
   // Create the offscreen device context and bitmap
   _hOffscreenDC = CreateCompatibleDC(GetDC(hWindow));
@@ -47,8 +47,8 @@ void GameStart(HWND hWindow)
   _wallBMP= new Bitmap(hDC, IDB_BITMAP3, _hInstance);
   _wandBMP= new Bitmap(hDC, IDB_BITMAP2, _hInstance);
   _pDesertBitmap = new Bitmap(hDC, IDB_DESERT, _hInstance);
-  _pCarBitmap = new Bitmap(hDC, IDB_IDLE, _hInstance);
-  _pSmCarBitmap = new Bitmap(hDC, IDB_SMCAR, _hInstance);
+  _pCarBitmap = new Bitmap(hDC, IDB_AVATAR, _hInstance);
+  _pSmCarBitmap = new Bitmap(hDC, IDB_HEART, _hInstance);
   _pMissileBitmap = new Bitmap(hDC, IDB_MISSILE, _hInstance);
   _pBlobboBitmap = new Bitmap(hDC, IDB_BLOBBO, _hInstance);
   _pBMissileBitmap = new Bitmap(hDC, IDB_BMISSILE, _hInstance);
@@ -61,7 +61,11 @@ void GameStart(HWND hWindow)
   _pLgExplosionBitmap = new Bitmap(hDC, IDB_LGEXPLOSION, _hInstance);
   _pGameOverBitmap = new Bitmap(hDC, IDB_GAMEOVER, _hInstance);
   _bossBitmap=new Bitmap(hDC, IDB_BOSS, _hInstance);
-  bool isElementSelected = false;
+  _pDarken=new Bitmap(hDC, IDB_BITMAP10, _hInstance);
+  _suBMP=new Bitmap(hDC, IDB_SU, _hInstance);
+  _surukenBMP=new Bitmap(hDC, IDB_SURUKEN, _hInstance);
+
+  isElementSelected = 0;
   bool fightCycle = false;
   // Create the starry background
   _pBackground = new StarryBackground(21*50, 15*50);
@@ -69,6 +73,7 @@ void GameStart(HWND hWindow)
   path = new coord * [1000];
   //Create dungeon
   map = new int* [maxrow];
+  _iCoordination = new int[2];
   for (int i = 0; i < maxrow; i++) {
       map[i] = new int[maxcol];
   }
@@ -198,7 +203,7 @@ void GamePaint(HDC hDC)
   _pBackground->Draw(hDC);
  
   
-  _element[0]->Draw(hDC);
+  //_element[0]->Draw(hDC);
   // Draw the desert bitmap
   //_pDesertBitmap->Draw(hDC, 0, 371);
   
@@ -206,6 +211,11 @@ void GamePaint(HDC hDC)
   // Draw the sprites
   _pGame->DrawSprites(hDC);
 
+  if (!fightCycle)
+  {
+      //_pDarken->Draw(hDC, _pCarSprite->GetPosition().left - 1000, _pCarSprite->GetPosition().top - 1000, TRUE);
+  }
+  
   //_pForestBitmap->Draw(hDC, 0, 0);
 
   // Draw the sprites
@@ -238,16 +248,15 @@ void GameCycle()
     // Randomly add aliens
     //if ((rand() % _iDifficulty) == 0)
     //  AddAlien();
-      if (fightCycle == false) {
+      if (!fightCycle) {
           AlienAI();
-          if (_numOfEnemies == 0) {
+          if (_numOfEnemies <= 0) {
               fightCycle = true;
               NewGame2();
           }
       }
       else {
-
-         //
+        AlienRandomMove();
       }
       
     // Update the background
@@ -322,10 +331,16 @@ void HandleKeys()
       RECT  rcBounds = { 0, 0, 21*50, 15*50 };
       RECT  rcPos = _pCarSprite->GetPosition();
       Sprite* pSprite;
-      if (isElementSelected == false) {
+      if (isElementSelected == 0) {
           pSprite = new Sprite(_pMissileBitmap, rcBounds, BA_DIE);
       }
-      else {
+      else if(isElementSelected == 1) {
+          pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
+      }
+      else if (isElementSelected == 2) {
+          pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
+      }
+      else if (isElementSelected == 3) {
           pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
       }
       pSprite->SetPosition(rcPos.left + 15, 400);
@@ -354,23 +369,31 @@ void MouseButtonDown(int x, int y, BOOL bLeft)
     RECT  rcPos = _pCarSprite->GetPosition();
     Sprite* pSprite;
     int speed=1;
-    if (isElementSelected == false) {
+    if (isElementSelected == 0) {
         pSprite = new Sprite(_pMissileBitmap, rcBounds, BA_DIE);
         pSprite->SetNumFrames(4);
-        speed = 10;
+        speed = 12;
     }
-    else {
-        pSprite = new Sprite(_missileWaterBitmap, rcBounds, BA_DIE);
+    else if(isElementSelected == 1){
+        pSprite = new Sprite(_suBMP, rcBounds, BA_DIE);
         pSprite->SetNumFrames(2);
-        speed = 5;
+        speed = 12;
+    }
+    else if (isElementSelected == 2) {
+        pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
+        pSprite->SetNumFrames(1);
+        speed = 8;
+    }
+    else if (isElementSelected == 3) {
+        pSprite = new Sprite(_surukenBMP, rcBounds, BA_DIE);
+        pSprite->SetNumFrames(2);
+        speed = 15;
     }
     pSprite->SetPosition(rcPos);
     /*pSprite->SetNumFrames(4);*/
     float deltaX = x - rcPos.left;
     float deltaY = y - rcPos.top;
     float magnitude = sqrt(deltaX * deltaX + deltaY * deltaY);
-    float a = cos(5);
-    printf("floats: %4.2f", a);
     pSprite->SetVelocity(deltaX / magnitude * speed, deltaY / magnitude * speed);
     _pGame->AddSprite(pSprite);
 
@@ -430,38 +453,7 @@ void checkElement() {
     ptVelocity = _pCarSprite->GetVelocity();
     if (abs(iXCollision) < 110 && abs(iYCollision) < 110)
     {
-        if (asteroidIndex == 0)
-        {
-            //fire
-            
-            printf("Fire");
-            RECT rcBounds = { 0, 0, 21*50, 15*50 };
-            RECT rcPos;
-            rcPos = _element[asteroidIndex]->GetPosition();
-            Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
-            pSprite->SetNumFrames(8, TRUE);
-            pSprite->SetPosition(rcPos.left, rcPos.top);
-            _pGame->AddSprite(pSprite);
-            isElementSelected = !isElementSelected;
-        }
-        else if (asteroidIndex == 1)
-        {
-            _element[asteroidIndex]->Kill();
-            //water
-            printf("water");
-        }
-        else if (asteroidIndex == 2)
-        {
-            _element[asteroidIndex]->Kill();
-            //earth
-            printf("earth");
-        }
-        else if (asteroidIndex == 3)
-        {
-            _element[asteroidIndex]->Kill();
-            //air
-            printf("air");
-        }
+        isElementSelected = asteroidIndex;
     }
 
 }
@@ -471,9 +463,9 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
   Bitmap* pHitter = pSpriteHitter->GetBitmap();
   Bitmap* pHittee = pSpriteHittee->GetBitmap();
   if (((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee == _pBlobboBitmap ||
-    pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap || pHittee == _wallBMP) ) ||
+    pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap || pHittee == _wallBMP || pHittee == _bossBitmap) ) ||
     (pHittee == _pMissileBitmap && (pHitter == _pBlobboBitmap ||
-    pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap || pHitter == _wallBMP)))
+    pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap || pHitter == _wallBMP || pHitter == _bossBitmap)))
      /* || (pHitter == _missileWaterBitmap && (pHittee == _pBlobboBitmap ||
           pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap)) ||
       (pHittee == _missileWaterBitmap && (pHitter == _pBlobboBitmap ||
@@ -491,7 +483,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
     RECT rcPos;
 
     if ((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee != _wallBMP)) {
-        rcPos = pSpriteHittee->GetPosition();
+        rcPos = pSpriteHitter->GetPosition();
         pSpriteHittee->SetHealth(pSpriteHittee->GetHealth() - 10);
         if (pSpriteHittee->GetHealth() <= 0)
         {
@@ -502,7 +494,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
         pSpriteHitter->Kill();
     }
     else if ((pHittee == _pMissileBitmap || pHittee == _missileWaterBitmap) && (pHitter != _wallBMP)) {
-        rcPos = pSpriteHitter->GetPosition();
+        rcPos = pSpriteHittee->GetPosition();
         pSpriteHitter->SetHealth(pSpriteHitter->GetHealth() - 10);
         if (pSpriteHitter->GetHealth() <= 0)
         {
@@ -513,10 +505,11 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
         pSpriteHittee->Kill();
 
     }
-    else {
+    else if(pHittee == _wallBMP || pHitter == _wallBMP) {
         rcPos = (pHitter == _wallBMP) ? pSpriteHittee->GetPosition() : pSpriteHitter->GetPosition();
         (pHitter == _wallBMP) ? pSpriteHittee->Kill() : pSpriteHitter->Kill();
     }
+    
     Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
     pSprite->SetNumFrames(8, TRUE);
     pSprite->SetPosition(rcPos.left, rcPos.top);
@@ -526,20 +519,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
     
     _iDifficulty = max(100 - (_iScore / 40), 40);
   }
-  /*if ((pHitter == _pCarBitmap && pHittee == _wallBMP) || (pHittee == _pCarBitmap && pHitter == _wallBMP)) {
-      if (pHitter == _pCarBitmap)
-      {
-          RECT pos = pSpriteHitter->GetPosition();
-          pSpriteHitter->SetVelocity(0, 0);
-          //pSpriteHitter->SetPosition(pos);
-      }
-      else
-      {
-          RECT pos = pSpriteHittee->GetPosition();
-          pSpriteHittee->SetVelocity(0, 0);
-          //pSpriteHittee->SetPosition(pos);
-      }
-  }*/
+
   auto pCar = (pHitter == _pCarBitmap) ? pSpriteHitter : pSpriteHittee;
   auto pWall = (pHitter == _wallBMP) ? pSpriteHitter : pSpriteHittee;
 
@@ -576,7 +556,7 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
     _pGame->AddSprite(pSprite);
 
     // Move the car back to the start
-    _pCarSprite->SetPosition(350, 400);
+    _pCarSprite->SetPosition(_iCoordination[1] * 50, _iCoordination[0] * 50);
 
     // See if the game is over
     if (--_iNumLives == 0)
@@ -626,16 +606,19 @@ void NewGame2()
     // Create the car sprite
     RECT rcBounds = { 0, 0, 21 * 50, 15 * 50 };
     _pCarSprite = new Sprite(_pCarBitmap, rcBounds);
-    _pCarSprite->SetNumFrames(4);
-    _pCarSprite->SetPosition(350, 400);
+    _pCarSprite->SetNumFrames(2);
+    _pCarSprite->SetFrameDelay(10);
+    _pCarSprite->SetPosition(400, 400);
     _pGame->AddSprite(_pCarSprite);
 
 
     
-    _pBossSprite = new AlienSprite(_bossBitmap, rcBounds, 30, BA_BOUNCE);
-    _pBossSprite->SetNumFrames(4);
+    _pBossSprite = new AlienSprite(_bossBitmap, rcBounds, 100, BA_BOUNCE);
+    _pBossSprite->SetNumFrames(3);
     _pBossSprite->SetFrameDelay(20);
     _pBossSprite->SetPosition(500, 500);
+    _pBossSprite->Setbfrm(0);
+    _pBossSprite->SetStep(2);
     _pGame->AddSprite(_pBossSprite);
     int counter = 0;
     for (int y = 0; y < maxrow; y++) {
@@ -656,17 +639,20 @@ void NewGame2()
     }
     _numOfEnemies = counter;
     
-    _element[0] = new Sprite(_wallBMP, rcBounds, BA_STOP);
-    _element[0]->SetPosition(250, 200);
+    _element[0] = new Sprite(_wandBMP, rcBounds, BA_STOP);
+    _element[0]->SetPosition(10, 10);
     _pGame->AddSprite(_element[0]);
+
     _element[1] = new Sprite(_wandBMP, rcBounds, BA_STOP);
-    _element[1]->SetPosition(250, 200);
+    _element[1]->SetPosition(21*50 - 40, 10);
     _pGame->AddSprite(_element[1]);
+
     _element[2] = new Sprite(_wandBMP, rcBounds, BA_STOP);
-    _element[2]->SetPosition(250, 200);
+    _element[2]->SetPosition(21*50-40, 15*50-60);
     _pGame->AddSprite(_element[2]);
+
     _element[3] = new Sprite(_wandBMP, rcBounds, BA_STOP);
-    _element[3]->SetPosition(250, 200);
+    _element[3]->SetPosition(10, 15 * 50 - 60);
     _pGame->AddSprite(_element[3]);
 
     /*for (int y = 0; y < maxrow; y++) {
@@ -697,8 +683,10 @@ void NewGame()
   // Create the car sprite
   RECT rcBounds = { 0, 0, 21*50, 15*50 };
   _pCarSprite = new Sprite(_pCarBitmap, rcBounds);
-  _pCarSprite->SetPosition(350, 400);
-  _pCarSprite->SetNumFrames(4);
+  FindCoordination();
+  _pCarSprite->SetPosition(_iCoordination[1] * 50, _iCoordination[0] * 50);
+  _pCarSprite->SetNumFrames(2);
+  _pCarSprite->SetFrameDelay(10);
   _pGame->AddSprite(_pCarSprite);
 
   for (int y = 0; y < maxrow; y++) {
@@ -731,18 +719,20 @@ void NewGame()
       }
   }
   _numOfEnemies = counter;
-  _element[0] = new Sprite(_wandBMP, rcBounds, BA_STOP);
+  /*_element[0] = new Sprite(_wandBMP, rcBounds, BA_STOP);
   _element[0]->SetPosition(250, 200);
   _pGame->AddSprite(_element[0]);
+
   _element[1] = new Sprite(_wandBMP, rcBounds, BA_STOP);
   _element[1]->SetPosition(250, 200);
   _pGame->AddSprite(_element[1]);
+
   _element[2] = new Sprite(_wandBMP, rcBounds, BA_STOP);
   _element[2]->SetPosition(250, 200);
   _pGame->AddSprite(_element[2]);
   _element[3] = new Sprite(_wandBMP, rcBounds, BA_STOP);
   _element[3]->SetPosition(250, 200);
-  _pGame->AddSprite(_element[3]);
+  _pGame->AddSprite(_element[3]);*/
 
   /*for (int y = 0; y < maxrow; y++) {
         for (int x = 0; x < maxcol; x++) {
@@ -836,7 +826,7 @@ void AddAlien(int x, int y, int index)
     pSprite->SetNumFrames(8);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
-    pSprite->SetStep(2);
+    pSprite->SetStep(3);
     //pSprite->SetVelocity((rand() % 7) - 2, (rand() % 7) - 2);
     break;
   case 1:
@@ -846,7 +836,7 @@ void AddAlien(int x, int y, int index)
     pSprite->SetNumFrames(8);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
-    pSprite->SetStep(2);
+    pSprite->SetStep(3);
     //pSprite->SetVelocity((rand() % 5) - 2, (rand() % 5) + 3);
     break;
   case 2:
@@ -856,7 +846,7 @@ void AddAlien(int x, int y, int index)
     pSprite->SetNumFrames(8);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
-    pSprite->SetStep(2);
+    pSprite->SetStep(3);
     //pSprite->SetVelocity((rand() % 7) + 3, 0);
     break;
   }
@@ -916,6 +906,71 @@ void AlienAI() {
         if (_Aliens[i] != NULL)
         {
             PathFinding(_Aliens[i]);
+        }
+    }
+}
+void AlienRandomMove() {
+
+    for (int i = 0; i < maxAlien; i++)
+    {
+        if (_Aliens[i] != NULL)
+        {
+            ChooseMovePosition(_Aliens[i]);
+        }
+    }
+    ChooseMovePosition(_pBossSprite);
+}
+void FindCoordination() {
+    for (int x = 0; x < maxrow; x++)
+    {
+        if (x > maxrow/2-1)
+        {
+            for (int y = 0; y < maxcol; y++)
+            {
+                if (map[x][y] == 0)
+                {
+                    _iCoordination[0] = x;
+                    _iCoordination[1] = y;
+                }
+            }
+        }
+        
+    }
+}
+void ChooseMovePosition(Sprite* alien) {
+
+    int x = rand() % (12 * 50);
+    int y = rand() % (12 * 50);
+
+
+
+    alien->Setbfrm(alien->Getbfrm() - alien->GetStep());
+    if (alien->Getbfrm() <= 0)
+    {
+        alien->SetVelocity(0, 0);
+        int alienPosX = ((alien->GetPosition()).left + (alien->GetPosition()).right)/2;
+        int alienPosY = ((alien->GetPosition()).top + (alien->GetPosition()).bottom)/2;
+
+
+        if (x >= alienPosX && y>= alienPosY)
+        {
+            alien->SetVelocity(alien->GetStep(), alien->GetStep());
+            alien->Setbfrm(50);
+        }
+        else if (x < alienPosX && y>= alienPosY)
+        {
+            alien->SetVelocity(-alien->GetStep(), alien->GetStep());
+            alien->Setbfrm(50);
+        }
+        else if (x < alienPosX && y < alienPosY)
+        {
+            alien->SetVelocity(-alien->GetStep(), -alien->GetStep());
+            alien->Setbfrm(50);
+        }
+        else if (x >= alienPosX && y < alienPosY)
+        {
+            alien->SetVelocity(alien->GetStep(), -alien->GetStep());
+            alien->Setbfrm(50);
         }
     }
 }

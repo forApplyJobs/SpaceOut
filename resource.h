@@ -15,6 +15,12 @@
 #define IDB_LEFTMOVE                    117
 #define IDB_BITMAP8                     118
 #define IDB_BOSS                        118
+#define IDB_BITMAP10                    119
+#define IDB_WAND						120
+#define IDB_SU							121
+#define IDB_SURUKEN						122
+#define IDB_AVATAR						123
+#define IDB_HEART						124
 #define IDI_SPACEOUT                    1000
 #define IDI_SPACEOUT_SM                 1001
 #define IDB_DESERT                      2000
@@ -42,7 +48,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        119
+#define _APS_NEXT_RESOURCE_VALUE        120
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           101
