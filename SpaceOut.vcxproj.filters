@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c8c17737-53ba-448f-8352-9f0bfb927820}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ab8ac426-3518-44ab-af09-d35d9bdc3425}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{d70b845a-1be6-4147-b9c0-84c4280a5906}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AlienSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpaceOut.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AlienSprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpaceOut.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="SpaceOut.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SpaceOut_sm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Desert.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Car.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SmCar.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Missile.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Blobbo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BMissile.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Jelly.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="JMissile.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Timmy.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="TMissile.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SmExplosion.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="LgExplosion.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="GameOver.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\0386c49bdd4bc5e2e59a77f0ae86b8bb.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\yangın.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\again.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\0386c49bdd4bc5e2e59a77f0ae86b8bb.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\deneme.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\deneme2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\Downloads\wall.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\downloads\bitmap4.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\downloads\bitmap5.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\..\..\downloads\bitmap6.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\bitmap7.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\wall.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\bitmap8.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\bitmap9.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap7.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap8.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap9.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SpaceOut.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Missile.wav" />
+    <Media Include="BMissile.wav" />
+    <Media Include="JMissile.wav" />
+    <Media Include="TMissile.wav" />
+    <Media Include="SmExplode.wav" />
+    <Media Include="LgExplode.wav" />
+    <Media Include="GameOver.wav" />
+  </ItemGroup>
+</Project>

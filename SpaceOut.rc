@@ -1,0 +1,81 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SPACEOUT            ICON                    "SpaceOut.ico"
+
+IDI_SPACEOUT_SM         ICON                    "SpaceOut_sm.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_DESERT              BITMAP                  "Desert.bmp"
+
+IDB_CAR                 BITMAP                  "Car.bmp"
+
+IDB_SMCAR               BITMAP                  "SmCar.bmp"
+
+IDB_MISSILE             BITMAP                  "Missile.bmp"
+
+IDB_BLOBBO              BITMAP                  "Blobbo.bmp"
+
+IDB_BMISSILE            BITMAP                  "BMissile.bmp"
+
+IDB_JELLY               BITMAP                  "Jelly.bmp"
+
+IDB_JMISSILE            BITMAP                  "JMissile.bmp"
+
+IDB_TIMMY               BITMAP                  "Timmy.bmp"
+
+IDB_TMISSILE            BITMAP                  "TMissile.bmp"
+
+IDB_SMEXPLOSION         BITMAP                  "SmExplosion.bmp"
+
+IDB_LGEXPLOSION         BITMAP                  "LgExplosion.bmp"
+
+IDB_GAMEOVER            BITMAP                  "GameOver.bmp"
+
+IDB_BITMAP1             BITMAP                  "bitmap1.bmp"
+
+IDB_BITMAP3             BITMAP                  "C:\\Users\\bilge\\downloads\\wall.bmp"
+
+IDB_IDLE                BITMAP                  "bitmap7.bmp"
+
+IDB_RIGHTMOVE           BITMAP                  "bitmap8.bmp"
+
+IDB_LEFTMOVE            BITMAP                  "bitmap9.bmp"
+
+IDB_BOSS                BITMAP                  "c:\\users\\bilge\\downloads\\bitmap8.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WAVE
+//
+
+IDW_MISSILE             WAVE                    "Missile.wav"
+
+IDW_BMISSILE            WAVE                    "BMissile.wav"
+
+IDW_JMISSILE            WAVE                    "JMissile.wav"
+
+IDW_TMISSILE            WAVE                    "TMissile.wav"
+
+IDW_SMEXPLODE           WAVE                    "SmExplode.wav"
+
+IDW_LGEXPLODE           WAVE                    "LgExplode.wav"
+
+IDW_GAMEOVER            WAVE                    "GameOver.wav"
+
+
