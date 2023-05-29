@@ -16,8 +16,8 @@
 BOOL GameInitialize(HINSTANCE hInstance)
 {
   // Create the game engine
-  _pGame = new GameEngine(hInstance, TEXT("Space Out"),
-    TEXT("Space Out"), IDI_SPACEOUT, IDI_SPACEOUT_SM, 21*50, 15*50);
+  _pGame = new GameEngine(hInstance, TEXT("Game"),
+    TEXT("Game"), IDI_SPACEOUT, IDI_SPACEOUT_SM, 21*50, 15*50);
   if (_pGame == NULL)
     return FALSE;
 
@@ -830,20 +830,20 @@ void AddAlien(int x, int y, int index)
     //pSprite->SetVelocity((rand() % 7) - 2, (rand() % 7) - 2);
     break;
   case 1:
-    // Jelly
+    // Water Wall
     pSprite = new AlienSprite(_pJellyBitmap, rcBounds, 20, BA_BOUNCE);
     _Aliens[index] = pSprite;
-    pSprite->SetNumFrames(8);
+    pSprite->SetNumFrames(2);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
     pSprite->SetStep(3);
     //pSprite->SetVelocity((rand() % 5) - 2, (rand() % 5) + 3);
     break;
   case 2:
-    // Timmy
+    // Fire Wall
     pSprite = new AlienSprite(_pTimmyBitmap, rcBounds, 5, BA_WRAP);
     _Aliens[index] = pSprite;
-    pSprite->SetNumFrames(8);
+    pSprite->SetNumFrames(2);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
     pSprite->SetStep(3);
