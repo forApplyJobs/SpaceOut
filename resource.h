@@ -21,6 +21,7 @@
 #define IDB_SURUKEN						122
 #define IDB_AVATAR						123
 #define IDB_HEART						124
+#define IDB_BOMB						125
 #define IDI_SPACEOUT                    1000
 #define IDI_SPACEOUT_SM                 1001
 #define IDB_DESERT                      2000

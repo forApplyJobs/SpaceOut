@@ -33,6 +33,9 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Bomb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AlienSprite.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bomb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -133,27 +139,6 @@
     <Image Include="..\..\..\..\..\downloads\bitmap5.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="..\..\..\..\..\downloads\bitmap6.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\bitmap7.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\bitmap8.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\bitmap9.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="bitmap7.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="bitmap8.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="bitmap9.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="bitmap10.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -182,6 +167,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="heart.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bomb.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

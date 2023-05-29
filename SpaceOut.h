@@ -15,6 +15,7 @@
 #include "Sprite.h"
 #include "Background.h"
 #include "AlienSprite.h"
+#include "Bomb.h"
 #include <stack>
 #include <queue>
 
@@ -54,7 +55,7 @@ coord **path;
 int maxrow = 15, maxcol = 21;
 int **map;
 int maxwall = 54, wall;
-int maxAlien = 10;
+int maxAlien = 15;
 
 GameEngine*       _pGame;
 HDC               _hOffscreenDC;
@@ -70,6 +71,7 @@ Bitmap*			  _wallBMP;
 Bitmap*           _leftMoveBitmap;
 Bitmap*           _wandBMP;
 Bitmap*           _suBMP;
+Bitmap*           _bombBMP;
 Bitmap*           _surukenBMP;
 Bitmap*           _avatarBMP;
 Sprite*			  _pDragSprite;
@@ -86,10 +88,12 @@ StarryBackground* _pBackground;
 Sprite*           _pCarSprite;
 Sprite*           _pBossSprite;
 Sprite*           _element[4];
-Sprite*           _Aliens[10];
+Bomb*             _bombs[4];
+Sprite*           _Aliens[15];
 int               _iFireInputDelay;
 int               _iNumLives, _iScore, _iDifficulty,_numOfEnemies;
 int *             _iCoordination;
+int               _iBombCount;
 BOOL              _bGameOver;
 HDC hDC;
 int isElementSelected;
@@ -107,3 +111,5 @@ void AlienAI();
 void AlienRandomMove();
 void FindCoordination();
 void ChooseMovePosition(Sprite* alien);
+void CheckBombs();
+void Explode(int index);

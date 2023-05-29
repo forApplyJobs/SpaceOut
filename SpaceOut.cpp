@@ -16,7 +16,7 @@
 BOOL GameInitialize(HINSTANCE hInstance)
 {
   // Create the game engine
-  _pGame = new GameEngine(hInstance, TEXT("Space Out"),
+  _pGame = new GameEngine(hInstance, TEXT("Elemental"),
     TEXT("Space Out"), IDI_SPACEOUT, IDI_SPACEOUT_SM, 21*50, 15*50);
   if (_pGame == NULL)
     return FALSE;
@@ -52,7 +52,7 @@ void GameStart(HWND hWindow)
   _pMissileBitmap = new Bitmap(hDC, IDB_MISSILE, _hInstance);
   _pBlobboBitmap = new Bitmap(hDC, IDB_BLOBBO, _hInstance);
   _pBMissileBitmap = new Bitmap(hDC, IDB_BMISSILE, _hInstance);
-  _pJellyBitmap = new Bitmap(hDC, IDB_JELLY, _hInstance);
+  _pJellyBitmap = new Bitmap(hDC, IDB_BITMAP3, _hInstance);
   _missileWaterBitmap= new Bitmap(hDC, IDB_JMISSILE, _hInstance);
   _pJMissileBitmap = new Bitmap(hDC, IDB_JMISSILE, _hInstance);
   _pTimmyBitmap = new Bitmap(hDC, IDB_TIMMY, _hInstance);
@@ -64,6 +64,9 @@ void GameStart(HWND hWindow)
   _pDarken=new Bitmap(hDC, IDB_BITMAP10, _hInstance);
   _suBMP=new Bitmap(hDC, IDB_SU, _hInstance);
   _surukenBMP=new Bitmap(hDC, IDB_SURUKEN, _hInstance);
+  _bombBMP =new Bitmap(hDC, IDB_BOMB, _hInstance);
+
+  _iBombCount = 0;
 
   isElementSelected = 0;
   bool fightCycle = false;
@@ -90,7 +93,7 @@ void GameStart(HWND hWindow)
           }
       }
   }
-  for (wall = 0; wall < maxwall; wall++) {
+  for (wall = 0; wall < maxwall*0.65; wall++) {
       int x, y, x1, y1, x2, y2; // x1 y1'den x2 y2'ye eriþim var mý
       bool wallOK;
 
@@ -261,7 +264,7 @@ void GameCycle()
       
     // Update the background
     _pBackground->Update();
-
+    CheckBombs();
     // Update the sprites
     _pGame->UpdateSprites();
 
@@ -325,27 +328,31 @@ void HandleKeys()
     }
 
     // Fire missiles based upon spacebar presses
-    if ((++_iFireInputDelay > 6) && GetAsyncKeyState(VK_SPACE) < 0)
+    if ((++_iFireInputDelay > 6) && GetAsyncKeyState(VK_SPACE) < 0 && _iBombCount < (sizeof(_bombs) / sizeof(int)))
     {
       // Create a new missile sprite
       RECT  rcBounds = { 0, 0, 21*50, 15*50 };
       RECT  rcPos = _pCarSprite->GetPosition();
-      Sprite* pSprite;
-      if (isElementSelected == 0) {
-          pSprite = new Sprite(_pMissileBitmap, rcBounds, BA_DIE);
+      int posX = ((rcPos.left + rcPos.right) / 100) * 50;
+      int posY = ((rcPos.top + rcPos.bottom) / 100) * 50;
+      Bomb* pSprite = new Bomb(_bombBMP, rcBounds, BA_DIE);
+      pSprite->SetPosition(posX, posY);
+      pSprite->SetVelocity(0, 0);
+      pSprite->SetNumFrames(2);
+      pSprite->SetFrameDelay(50);
+      pSprite->burstTime = 50;
+
+      for (int i = 0; i < (sizeof(_bombs) / sizeof(int)); i++)
+      {
+          if (_bombs[i] == NULL)
+          {
+              _bombs[i] = pSprite;
+              _iBombCount++;
+              _pGame->AddSprite(pSprite);
+              break;
+          }
       }
-      else if(isElementSelected == 1) {
-          pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
-      }
-      else if (isElementSelected == 2) {
-          pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
-      }
-      else if (isElementSelected == 3) {
-          pSprite = new Sprite(_wallBMP, rcBounds, BA_DIE);
-      }
-      pSprite->SetPosition(rcPos.left + 15, 400);
-      pSprite->SetVelocity(0, -7);
-      _pGame->AddSprite(pSprite);
+      
 
       // Play the missile (fire) sound
       PlaySound((LPCSTR)IDW_MISSILE, _hInstance, SND_ASYNC |
@@ -462,63 +469,84 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
   // See if a player missile and an alien have collided
   Bitmap* pHitter = pSpriteHitter->GetBitmap();
   Bitmap* pHittee = pSpriteHittee->GetBitmap();
-  if (((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee == _pBlobboBitmap ||
-    pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap || pHittee == _wallBMP || pHittee == _bossBitmap) ) ||
-    (pHittee == _pMissileBitmap && (pHitter == _pBlobboBitmap ||
-    pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap || pHitter == _wallBMP || pHitter == _bossBitmap)))
-     /* || (pHitter == _missileWaterBitmap && (pHittee == _pBlobboBitmap ||
-          pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap)) ||
-      (pHittee == _missileWaterBitmap && (pHitter == _pBlobboBitmap ||
-          pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap))*/
+  //if (((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee == _pBlobboBitmap ||
+  //  pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap || pHittee == _wallBMP || pHittee == _bossBitmap) ) ||
+  //  (pHittee == _pMissileBitmap && (pHitter == _pBlobboBitmap ||
+  //  pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap || pHitter == _wallBMP || pHitter == _bossBitmap)))
+  //   /* || (pHitter == _missileWaterBitmap && (pHittee == _pBlobboBitmap ||
+  //        pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap)) ||
+  //    (pHittee == _missileWaterBitmap && (pHitter == _pBlobboBitmap ||
+  //        pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap))*/
+  //{
+  //  // Play the small explosion sound
+  //  PlaySound((LPCSTR)IDW_LGEXPLODE, _hInstance, SND_ASYNC |
+  //    SND_RESOURCE);
+
+  //  // Kill both sprites
+  //  
+
+  //  // Create a large explosion sprite at the alien's position
+  //  RECT rcBounds = { 0, 0, 21 * 50, 15 * 50 };
+  //  RECT rcPos;
+
+  //  if ((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee != _wallBMP)) {
+  //      rcPos = pSpriteHitter->GetPosition();
+  //      pSpriteHittee->SetHealth(pSpriteHittee->GetHealth() - 10);
+  //      if (pSpriteHittee->GetHealth() <= 0)
+  //      {
+  //          pSpriteHittee->Kill();
+  //          _numOfEnemies--;
+  //          _iScore += 25;
+  //      }
+  //      pSpriteHitter->Kill();
+  //  }
+  //  else if ((pHittee == _pMissileBitmap || pHittee == _missileWaterBitmap) && (pHitter != _wallBMP)) {
+  //      rcPos = pSpriteHittee->GetPosition();
+  //      pSpriteHitter->SetHealth(pSpriteHitter->GetHealth() - 10);
+  //      if (pSpriteHitter->GetHealth() <= 0)
+  //      {
+  //          pSpriteHitter->Kill();
+  //          _iScore += 25;
+  //          _numOfEnemies--;
+  //      }
+  //      pSpriteHittee->Kill();
+
+  //  }
+  //  else if(pHittee == _wallBMP || pHitter == _wallBMP) {
+  //      rcPos = (pHitter == _wallBMP) ? pSpriteHittee->GetPosition() : pSpriteHitter->GetPosition();
+  //      (pHitter == _wallBMP) ? pSpriteHittee->Kill() : pSpriteHitter->Kill();
+  //  }
+  //  
+  //  Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
+  //  pSprite->SetNumFrames(8, TRUE);
+  //  pSprite->SetPosition(rcPos.left, rcPos.top);
+  //  _pGame->AddSprite(pSprite);
+  RECT rcBounds = { 0, 0, 21 * 50, 15 * 50 };
+  RECT rcPos;
+  if ((pHitter == _pBlobboBitmap || pHitter == _pJellyBitmap || pHitter == _pTimmyBitmap) && (pHittee == _pBlobboBitmap 
+      || pHittee == _pJellyBitmap || pHittee == _pTimmyBitmap) && pHitter != pHittee)
   {
-    // Play the small explosion sound
-    PlaySound((LPCSTR)IDW_LGEXPLODE, _hInstance, SND_ASYNC |
-      SND_RESOURCE);
-
-    // Kill both sprites
-    
-
-    // Create a large explosion sprite at the alien's position
-    RECT rcBounds = { 0, 0, 21 * 50, 15 * 50 };
-    RECT rcPos;
-
-    if ((pHitter == _pMissileBitmap|| pHitter == _missileWaterBitmap) && (pHittee != _wallBMP)) {
-        rcPos = pSpriteHitter->GetPosition();
-        pSpriteHittee->SetHealth(pSpriteHittee->GetHealth() - 10);
-        if (pSpriteHittee->GetHealth() <= 0)
-        {
-            pSpriteHittee->Kill();
-            _numOfEnemies--;
-            _iScore += 25;
-        }
-        pSpriteHitter->Kill();
-    }
-    else if ((pHittee == _pMissileBitmap || pHittee == _missileWaterBitmap) && (pHitter != _wallBMP)) {
-        rcPos = pSpriteHittee->GetPosition();
-        pSpriteHitter->SetHealth(pSpriteHitter->GetHealth() - 10);
-        if (pSpriteHitter->GetHealth() <= 0)
-        {
-            pSpriteHitter->Kill();
-            _iScore += 25;
-            _numOfEnemies--;
-        }
-        pSpriteHittee->Kill();
-
-    }
-    else if(pHittee == _wallBMP || pHitter == _wallBMP) {
-        rcPos = (pHitter == _wallBMP) ? pSpriteHittee->GetPosition() : pSpriteHitter->GetPosition();
-        (pHitter == _wallBMP) ? pSpriteHittee->Kill() : pSpriteHitter->Kill();
-    }
-    
-    Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
-    pSprite->SetNumFrames(8, TRUE);
-    pSprite->SetPosition(rcPos.left, rcPos.top);
-    _pGame->AddSprite(pSprite);
-
+      
+      rcPos = pSpriteHitter->GetPosition();
+      pSpriteHittee->Kill();
+      pSpriteHitter->Kill();
+      Sprite* pSprite = new Sprite(_wallBMP, rcBounds);
+      pSprite->SetNumFrames(1);
+      int x = (rcPos.left + rcPos.right) / 100;
+      int y = (rcPos.bottom + rcPos.top) / 100;
+      pSprite->SetPosition(((rcPos.left + rcPos.right) / 100)*50, ((rcPos.bottom + rcPos.top) / 100)*50);
+      map[y][x] = 100;
+      _pGame->AddSprite(pSprite);
+      
+  }
+  if ((pHitter == _pLgExplosionBitmap && pHittee == _wallBMP) || (pHittee == _pLgExplosionBitmap && pHitter == _wallBMP))
+  {
+      pHitter == _wallBMP ? pSpriteHitter->Kill() : pSpriteHittee->Kill();
+  }
     // Update the score
     
     _iDifficulty = max(100 - (_iScore / 40), 40);
-  }
+  
 
   auto pCar = (pHitter == _pCarBitmap) ? pSpriteHitter : pSpriteHittee;
   auto pWall = (pHitter == _wallBMP) ? pSpriteHitter : pSpriteHittee;
@@ -528,45 +556,45 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
       pCar->SetPosition(pCar->GetPrevPosition());
   }
   // See if an alien missile has collided with the car
-  if ((pHitter == _pCarBitmap && (pHittee == _pBMissileBitmap ||
-    pHittee == _pJMissileBitmap || pHittee == _pTMissileBitmap)) ||
-    (pHittee == _pCarBitmap && (pHitter == _pBMissileBitmap ||
-    pHitter == _pJMissileBitmap || pHitter == _pTMissileBitmap)))
-  {
-    // Play the large explosion sound
-    PlaySound((LPCSTR)IDW_LGEXPLODE, _hInstance, SND_ASYNC |
-      SND_RESOURCE);
+  //if ((pHitter == _pCarBitmap && (pHittee == _pBMissileBitmap ||
+  //  pHittee == _pJMissileBitmap || pHittee == _pTMissileBitmap)) ||
+  //  (pHittee == _pCarBitmap && (pHitter == _pBMissileBitmap ||
+  //  pHitter == _pJMissileBitmap || pHitter == _pTMissileBitmap)))
+  //{
+  //  // Play the large explosion sound
+  //  PlaySound((LPCSTR)IDW_LGEXPLODE, _hInstance, SND_ASYNC |
+  //    SND_RESOURCE);
 
-    // Kill the missile sprite
-    if (pHitter == _pCarBitmap)
-      pSpriteHittee->Kill();
-    else
-      pSpriteHitter->Kill();
+  //  // Kill the missile sprite
+  //  if (pHitter == _pCarBitmap)
+  //    pSpriteHittee->Kill();
+  //  else
+  //    pSpriteHitter->Kill();
 
-    // Create a large explosion sprite at the car's position
-    RECT rcBounds = { 0, 0, 21*50, 15*50 };
-    RECT rcPos;
-    if (pHitter == _pCarBitmap)
-      rcPos = pSpriteHitter->GetPosition();
-    else
-      rcPos = pSpriteHittee->GetPosition();
-    Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
-    pSprite->SetNumFrames(8, TRUE);
-    pSprite->SetPosition(rcPos.left, rcPos.top);
-    _pGame->AddSprite(pSprite);
+  //  // Create a large explosion sprite at the car's position
+  //  RECT rcBounds = { 0, 0, 21*50, 15*50 };
+  //  RECT rcPos;
+  //  if (pHitter == _pCarBitmap)
+  //    rcPos = pSpriteHitter->GetPosition();
+  //  else
+  //    rcPos = pSpriteHittee->GetPosition();
+  //  Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
+  //  pSprite->SetNumFrames(8, TRUE);
+  //  pSprite->SetPosition(rcPos.left, rcPos.top);
+  //  _pGame->AddSprite(pSprite);
 
-    // Move the car back to the start
-    _pCarSprite->SetPosition(_iCoordination[1] * 50, _iCoordination[0] * 50);
+  //  // Move the car back to the start
+  //  _pCarSprite->SetPosition(_iCoordination[1] * 50, _iCoordination[0] * 50);
 
-    // See if the game is over
-    if (--_iNumLives == 0)
-    {
-      // Play the game over sound
-      PlaySound((LPCSTR)IDW_GAMEOVER, _hInstance, SND_ASYNC |
-        SND_RESOURCE);
-      _bGameOver = TRUE;
-    }
-  }
+  //  // See if the game is over
+  //  if (--_iNumLives == 0)
+  //  {
+  //    // Play the game over sound
+  //    PlaySound((LPCSTR)IDW_GAMEOVER, _hInstance, SND_ASYNC |
+  //      SND_RESOURCE);
+  //    _bGameOver = TRUE;
+  //  }
+  //}
 
   return FALSE;
 }
@@ -702,22 +730,26 @@ void NewGame()
       }
   }
   int counter = 0;
-  for (int y = 0; y < maxrow; y++) {
-      for (int x = 0; x < maxcol; x++) {
-          if (rand() % 20 == 0)
-          {
-              if (map[y][x] == 0 && counter < maxAlien)
+  while (counter < maxAlien)
+  {
+      for (int y = 0; y < maxrow; y++) {
+          for (int x = 0; x < maxcol; x++) {
+              if (rand() % 20 == 0)
               {
-                  //_wallBMP->Draw(hDC, x * 50, y * 50);
+                  if (map[y][x] == 0 && counter < maxAlien)
+                  {
+                      //_wallBMP->Draw(hDC, x * 50, y * 50);
 
-                  AddAlien(x * 50, y * 50, counter);
-                  counter++;
+                      AddAlien(x * 50, y * 50, counter);
+                      counter++;
 
+                  }
               }
+
           }
-          
       }
   }
+  
   _numOfEnemies = counter;
   /*_element[0] = new Sprite(_wandBMP, rcBounds, BA_STOP);
   _element[0]->SetPosition(250, 200);
@@ -833,7 +865,7 @@ void AddAlien(int x, int y, int index)
     // Jelly
     pSprite = new AlienSprite(_pJellyBitmap, rcBounds, 20, BA_BOUNCE);
     _Aliens[index] = pSprite;
-    pSprite->SetNumFrames(8);
+    pSprite->SetNumFrames(1);
     pSprite->SetPosition(x, y);
     pSprite->Setbfrm(0);
     pSprite->SetStep(3);
@@ -905,7 +937,52 @@ void AlienAI() {
     {
         if (_Aliens[i] != NULL)
         {
-            PathFinding(_Aliens[i]);
+            //PathFinding(_Aliens[i]);
+
+            int x = (_Aliens[i]->GetPosition().left + _Aliens[i]->GetPosition().right) / 100;
+            int y = (_Aliens[i]->GetPosition().bottom + _Aliens[i]->GetPosition().top) / 100;
+            int moveX, moveY;
+            bool hasMoved = false;
+            if (x > 0 && x < 20 && y > 0 && y < 14)
+            {
+                _Aliens[i]->Setbfrm(_Aliens[i]->Getbfrm() - _Aliens[i]->GetStep());
+                if (_Aliens[i]->Getbfrm() <= 0)
+                {
+                    while (!hasMoved)
+                    {
+                        int direction = rand() % 4;
+
+                        switch (direction)
+                        {
+                        case 0:
+                            moveX = x + 1;
+                            moveY = y;
+                            break;
+                        case 1:
+                            moveX = x - 1;
+                            moveY = y;
+                            break;
+                        case 2:
+                            moveX = x;
+                            moveY = y - 1;
+                            break;
+                        case 3:
+                            moveX = x;
+                            moveY = y + 1;
+                            break;
+                        default:
+                            break;
+                        }
+                        if (map[moveY][moveX] == 0)
+                        {
+                            _Aliens[i]->SetVelocity(_Aliens[i]->GetStep() * (moveX - x), _Aliens[i]->GetStep() * (moveY - y));
+                            _Aliens[i]->Setbfrm(50);
+                            hasMoved = true;
+                        }
+                    }
+                }
+            }
+            
         }
     }
 }
@@ -973,4 +1050,46 @@ void ChooseMovePosition(Sprite* alien) {
             alien->Setbfrm(50);
         }
     }
+}
+void CheckBombs() {
+    for (int i = 0; i < (sizeof(_bombs) / sizeof(int)); i++)
+    {
+        if (_bombs[i] != NULL)
+        {
+            _bombs[i]->SpendTime();
+            if (_bombs[i]->burstTime <= 0)
+            {
+                Explode(i);
+            }
+        }
+    }
+}
+void Explode(int index) {
+    RECT rcBounds = { 0, 0, 21 * 50, 15 * 50 };
+
+    Bomb* bomb = _bombs[index];
+
+    Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
+    pSprite->SetNumFrames(8, TRUE);
+    pSprite->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right)/2 + 50, (bomb->GetPosition().bottom + bomb->GetPosition().top)/2);
+    _pGame->AddSprite(pSprite);
+
+    Sprite* pSprite2 = new Sprite(_pLgExplosionBitmap, rcBounds);
+    pSprite2->SetNumFrames(8, TRUE);
+    pSprite2->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2 - 50, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2);
+    _pGame->AddSprite(pSprite2);
+
+    Sprite* pSprite3 = new Sprite(_pLgExplosionBitmap, rcBounds);
+    pSprite3->SetNumFrames(8, TRUE);
+    pSprite3->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2 + 50);
+    _pGame->AddSprite(pSprite3);
+
+    Sprite* pSprite4 = new Sprite(_pLgExplosionBitmap, rcBounds);
+    pSprite4->SetNumFrames(8, TRUE);
+    pSprite4->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2 - 50);
+    _pGame->AddSprite(pSprite4);
+    
+    bomb->Kill();
+    _bombs[index] = NULL;
+    _iBombCount--;
 }

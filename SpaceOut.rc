@@ -70,6 +70,8 @@ IDB_AVATAR				BITMAP                  "avatar.bmp"
 
 IDB_HEART				BITMAP                  "heart.bmp"
 
+IDB_BOMB				BITMAP                  "bomb.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
