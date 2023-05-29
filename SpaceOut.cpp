@@ -16,8 +16,8 @@
 BOOL GameInitialize(HINSTANCE hInstance)
 {
   // Create the game engine
-  _pGame = new GameEngine(hInstance, TEXT("Game"),
-    TEXT("Game"), IDI_SPACEOUT, IDI_SPACEOUT_SM, 21*50, 15*50);
+  _pGame = new GameEngine(hInstance, TEXT("Elemental"),
+    TEXT("Elemental"), IDI_SPACEOUT, IDI_SPACEOUT_SM, 21*50, 15*50);
   if (_pGame == NULL)
     return FALSE;
 
