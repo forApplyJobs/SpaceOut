@@ -94,7 +94,7 @@ void GameStart(HWND hWindow)
           }
       }
   }
-  for (wall = 0; wall < maxwall*0.65; wall++) {
+  for (wall = 0; wall < maxwall*0.25; wall++) {
       int x, y, x1, y1, x2, y2; // x1 y1'den x2 y2'ye eriþim var mý
       bool wallOK;
 
@@ -120,7 +120,7 @@ void GameStart(HWND hWindow)
               }
               if (map[y][x] == 0)
               {
-                  map[y][x] = 101; //additional wall code
+                  map[y][x] = 100; //additional wall code
                   wallOK = true;
 
                   c1 = new coord(x1, y1);
@@ -229,10 +229,16 @@ void GamePaint(HDC hDC)
   // Draw the score
   TCHAR szText[64];
   RECT  rect = { 460, 0, 510, 30 };
-  wsprintf(szText, "%d %d", _iScore,_numOfEnemies);
+  wsprintf(szText, "%d %d", _iTempPosX, _iTempPosY);
   SetBkMode(hDC, TRANSPARENT);
   SetTextColor(hDC, RGB(255, 255, 255));
   DrawText(hDC, szText, -1, &rect, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
+  TCHAR szText1[64];
+  RECT  rect1 = { 500, 0, 540, 100 };
+  wsprintf(szText1, "%d %d", _iTempPosXK, _iTempPosYK);
+  SetBkMode(hDC, TRANSPARENT);
+  SetTextColor(hDC, RGB(255, 255, 255));
+  DrawText(hDC, szText1, -1, &rect1, DT_SINGLELINE | DT_RIGHT | DT_VCENTER);
 
   // Draw the number of remaining lives (cars)
   for (int i = 0; i < _iNumLives; i++)
@@ -256,16 +262,18 @@ void GameCycle()
           AlienAI();
           if (_numOfEnemies <= 0) {
               fightCycle = true;
-              NewGame2();
+              
           }
           _pKeySprite->Setbfrm(_pKeySprite->Getbfrm() - _pKeySprite->GetStep());
           if (_pKeySprite->Getbfrm() <= 0)
           {
-              MoveKey();
+              //MoveKey();
           }
       }
       else {
-        AlienRandomMove();
+          NewGame();
+          fightCycle = false;
+        //AlienRandomMove();
       }
       
     // Update the background
@@ -334,19 +342,21 @@ void HandleKeys()
     }
 
     // Fire missiles based upon spacebar presses
-    if ((++_iFireInputDelay > 30) && GetAsyncKeyState(VK_SPACE) < 0 && _iBombCount < (sizeof(_bombs) / sizeof(int)))
+    if ((++_iFireInputDelay > 30) && GetAsyncKeyState(VK_SPACE) < 0)
     {
-      // Create a new missile sprite
+      
       for (int i = 0; i < (sizeof(_bombs) / sizeof(int)); i++)
       {
           if (_bombs[i] == NULL)
           {
               RECT  rcBounds = { 0, 0, 21 * 50, 15 * 50 };
               RECT  rcPos = _pCarSprite->GetPosition();
-              int posX = ((rcPos.left + rcPos.right) / 100) * 50 + 10;
-              int posY = ((rcPos.top + rcPos.bottom) / 100) * 50 + 10;
-              Bomb* pSprite = new Bomb(_bombBMP, rcBounds, BA_DIE);
-              pSprite->SetPosition(posX, posY);
+              _iTempPosX = ((rcPos.left + rcPos.right) / 100) * 50;
+              _iTempPosY = ((rcPos.top + rcPos.bottom) / 100) * 50;
+              std::cout << "-->" << _iTempPosX;
+              std::cout << "-->" << _iTempPosY;
+              Bomb* pSprite = new Bomb(_bombBMP, rcBounds, BA_STOP);
+              pSprite->SetPosition(_iTempPosX, _iTempPosY);
               pSprite->SetVelocity(0, 0);
               pSprite->SetNumFrames(2);
               pSprite->SetFrameDelay(40);
@@ -544,19 +554,40 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
       _pGame->AddSprite(pSprite);
       
   }
+
   if ((pHitter == _pLgExplosionBitmap && pHittee == _wallBMP) || (pHittee == _pLgExplosionBitmap && pHitter == _wallBMP))
   {
       RECT pos = pHitter == _wallBMP ? pSpriteHitter->GetPosition() : pSpriteHittee->GetPosition();
       int x = ((pos.left + pos.right) / 100);
       int y = ((pos.top + pos.bottom) / 100);
-      map[y][x] = 0;
-      pHitter == _wallBMP ? pSpriteHitter->Kill() : pSpriteHittee->Kill();
+      if (map[y][x] == 200)
+      {
+          Sprite* key = new Sprite(_keyBMP, rcBounds);
+          key->SetPosition(pos);
+          _pGame->AddSprite(key);
+          map[y][x] = 5;
+          if (pHitter == _wallBMP)
+          {
+              pSpriteHitter->Kill();
+          }
+          else
+              pSpriteHittee->Kill();
+      }
+      else
+      {
+          if (pHitter == _wallBMP)
+          {
+              pSpriteHitter->Kill();
+          }
+          else
+              pSpriteHittee->Kill();
+      }
   }
     // Update the score
   if ((pHitter == _pCarBitmap && pHittee == _keyBMP) || (pHittee == _pCarBitmap && pHitter == _keyBMP))
   {
-      _pGame->CleanupSprites();
-      NewGame();
+      fightCycle = true;
+      
   }
     _iDifficulty = max(100 - (_iScore / 40), 40);
   
@@ -731,10 +762,10 @@ void NewGame()
   _pGame->AddSprite(_pCarSprite);
 
   _pKeySprite = new Sprite(_keyBMP, rcBounds);
-  _pKeySprite->Setbfrm(240);
+  _pKeySprite->Setbfrm(18000);
   _pKeySprite->SetStep(1);
   MoveKey();
-  _pGame->AddSprite(_pKeySprite);
+  //_pGame->AddSprite(_pKeySprite);
 
   for (int y = 0; y < maxrow; y++) {
       for (int x = 0; x < maxcol; x++) {
@@ -1088,28 +1119,31 @@ void Explode(int index) {
 
     Bomb* bomb = _bombs[index];
 
+    RECT position = bomb->GetPosition();
+
     Sprite* pSprite = new Sprite(_pLgExplosionBitmap, rcBounds);
     pSprite->SetNumFrames(8, TRUE);
-    pSprite->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right)/2 + 50, (bomb->GetPosition().bottom + bomb->GetPosition().top)/2);
+    pSprite->SetPosition((position.left + position.right)/2 + 50, (position.bottom + position.top)/2);
     _pGame->AddSprite(pSprite);
 
     Sprite* pSprite2 = new Sprite(_pLgExplosionBitmap, rcBounds);
     pSprite2->SetNumFrames(8, TRUE);
-    pSprite2->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2 - 50, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2);
+    pSprite2->SetPosition((position.left + position.right) / 2 - 50, (position.bottom + position.top) / 2);
     _pGame->AddSprite(pSprite2);
 
     Sprite* pSprite3 = new Sprite(_pLgExplosionBitmap, rcBounds);
     pSprite3->SetNumFrames(8, TRUE);
-    pSprite3->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2 + 50);
+    pSprite3->SetPosition((position.left + position.right) / 2, (position.bottom + position.top) / 2 + 50);
     _pGame->AddSprite(pSprite3);
 
     Sprite* pSprite4 = new Sprite(_pLgExplosionBitmap, rcBounds);
     pSprite4->SetNumFrames(8, TRUE);
-    pSprite4->SetPosition((bomb->GetPosition().left + bomb->GetPosition().right) / 2, (bomb->GetPosition().bottom + bomb->GetPosition().top) / 2 - 50);
+    pSprite4->SetPosition((position.left + position.right) / 2, (position.bottom + position.top) / 2 - 50);
     _pGame->AddSprite(pSprite4);
-    
-    bomb->Kill();
+
     _bombs[index] = NULL;
+    bomb->Kill();
+    
     _iBombCount--;
 }
 void MoveKey() {
@@ -1120,21 +1154,24 @@ void MoveKey() {
         {
             for (int x = 1; x < maxcol - 1; x++)
             {
+                if (map[y][x] == 200)
+                {
+                    map[y][x] = 100;
+                }
                 if (!hasMoved)
                 {
-                    if (map[y][x] != 0)
+                    if (map[y][x] == 100)
                     {
                         if (rand() % 20 == 0)
                         {
-                            _pKeySprite->SetPosition(x * 50 + 25, y * 50 + 25);
                             _pKeySprite->Setbfrm(240);
+                            map[y][x] = 200;
                             hasMoved = true;
+                            _iTempPosXK = x * 50;
+                            _iTempPosYK = y * 50;
                         }
-                    }
-                }
-                else
-                    break;
-                
+                    }     
+                }                       
             }
         }
         
@@ -1143,4 +1180,7 @@ void MoveKey() {
     {
         _pKeySprite->Setbfrm(240);
     }
+}
+void CheckWalls() {
+
 }

@@ -45,10 +45,6 @@ SPRITEACTION Bomb::Update()
     SPRITEACTION saSpriteAction;
     saSpriteAction = Sprite::Update();
 
-    // See if the alien should fire a missile
-    if ((rand() % (_iDifficulty / 2)) == 0)
-        saSpriteAction |= SA_ADDSPRITE;
-
     return saSpriteAction;
 }
 
