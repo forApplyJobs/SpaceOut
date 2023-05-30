@@ -60,6 +60,7 @@ void GameStart(HWND hWindow)
   _pSmExplosionBitmap = new Bitmap(hDC, IDB_SMEXPLOSION, _hInstance);
   _pLgExplosionBitmap = new Bitmap(hDC, IDB_LGEXPLOSION, _hInstance);
   _pGameOverBitmap = new Bitmap(hDC, IDB_GAMEOVER, _hInstance);
+  _keyBMP = new Bitmap(hDC, IDB_HEART, _hInstance);
   _bossBitmap=new Bitmap(hDC, IDB_BOSS, _hInstance);
   _pDarken=new Bitmap(hDC, IDB_BITMAP10, _hInstance);
   _suBMP=new Bitmap(hDC, IDB_SU, _hInstance);
@@ -257,6 +258,11 @@ void GameCycle()
               fightCycle = true;
               NewGame2();
           }
+          _pKeySprite->Setbfrm(_pKeySprite->Getbfrm() - _pKeySprite->GetStep());
+          if (_pKeySprite->Getbfrm() <= 0)
+          {
+              MoveKey();
+          }
       }
       else {
         AlienRandomMove();
@@ -328,24 +334,23 @@ void HandleKeys()
     }
 
     // Fire missiles based upon spacebar presses
-    if ((++_iFireInputDelay > 6) && GetAsyncKeyState(VK_SPACE) < 0 && _iBombCount < (sizeof(_bombs) / sizeof(int)))
+    if ((++_iFireInputDelay > 30) && GetAsyncKeyState(VK_SPACE) < 0 && _iBombCount < (sizeof(_bombs) / sizeof(int)))
     {
       // Create a new missile sprite
-      RECT  rcBounds = { 0, 0, 21*50, 15*50 };
-      RECT  rcPos = _pCarSprite->GetPosition();
-      int posX = ((rcPos.left + rcPos.right) / 100) * 50;
-      int posY = ((rcPos.top + rcPos.bottom) / 100) * 50;
-      Bomb* pSprite = new Bomb(_bombBMP, rcBounds, BA_DIE);
-      pSprite->SetPosition(posX, posY);
-      pSprite->SetVelocity(0, 0);
-      pSprite->SetNumFrames(2);
-      pSprite->SetFrameDelay(50);
-      pSprite->burstTime = 50;
-
       for (int i = 0; i < (sizeof(_bombs) / sizeof(int)); i++)
       {
           if (_bombs[i] == NULL)
           {
+              RECT  rcBounds = { 0, 0, 21 * 50, 15 * 50 };
+              RECT  rcPos = _pCarSprite->GetPosition();
+              int posX = ((rcPos.left + rcPos.right) / 100) * 50 + 10;
+              int posY = ((rcPos.top + rcPos.bottom) / 100) * 50 + 10;
+              Bomb* pSprite = new Bomb(_bombBMP, rcBounds, BA_DIE);
+              pSprite->SetPosition(posX, posY);
+              pSprite->SetVelocity(0, 0);
+              pSprite->SetNumFrames(2);
+              pSprite->SetFrameDelay(40);
+              pSprite->burstTime = 50;
               _bombs[i] = pSprite;
               _iBombCount++;
               _pGame->AddSprite(pSprite);
@@ -541,10 +546,18 @@ BOOL SpriteCollision(Sprite* pSpriteHitter, Sprite* pSpriteHittee)
   }
   if ((pHitter == _pLgExplosionBitmap && pHittee == _wallBMP) || (pHittee == _pLgExplosionBitmap && pHitter == _wallBMP))
   {
+      RECT pos = pHitter == _wallBMP ? pSpriteHitter->GetPosition() : pSpriteHittee->GetPosition();
+      int x = ((pos.left + pos.right) / 100);
+      int y = ((pos.top + pos.bottom) / 100);
+      map[y][x] = 0;
       pHitter == _wallBMP ? pSpriteHitter->Kill() : pSpriteHittee->Kill();
   }
     // Update the score
-    
+  if ((pHitter == _pCarBitmap && pHittee == _keyBMP) || (pHittee == _pCarBitmap && pHitter == _keyBMP))
+  {
+      _pGame->CleanupSprites();
+      NewGame();
+  }
     _iDifficulty = max(100 - (_iScore / 40), 40);
   
 
@@ -712,10 +725,16 @@ void NewGame()
   RECT rcBounds = { 0, 0, 21*50, 15*50 };
   _pCarSprite = new Sprite(_pCarBitmap, rcBounds);
   FindCoordination();
-  _pCarSprite->SetPosition(_iCoordination[1] * 50, _iCoordination[0] * 50);
+  _pCarSprite->SetPosition(_iCoordination[0] * 50, _iCoordination[1] * 50);
   _pCarSprite->SetNumFrames(2);
   _pCarSprite->SetFrameDelay(10);
   _pGame->AddSprite(_pCarSprite);
+
+  _pKeySprite = new Sprite(_keyBMP, rcBounds);
+  _pKeySprite->Setbfrm(240);
+  _pKeySprite->SetStep(1);
+  MoveKey();
+  _pGame->AddSprite(_pKeySprite);
 
   for (int y = 0; y < maxrow; y++) {
       for (int x = 0; x < maxcol; x++) {
@@ -998,13 +1017,13 @@ void AlienRandomMove() {
     ChooseMovePosition(_pBossSprite);
 }
 void FindCoordination() {
-    for (int x = 0; x < maxrow; x++)
+    for (int y = 0; y < maxrow; y++)
     {
-        if (x > maxrow/2-1)
+        if (y > maxrow/2-1)
         {
-            for (int y = 0; y < maxcol; y++)
+            for (int x = 0; x < maxcol; x++)
             {
-                if (map[x][y] == 0)
+                if (map[y][x] == 0)
                 {
                     _iCoordination[0] = x;
                     _iCoordination[1] = y;
@@ -1092,4 +1111,36 @@ void Explode(int index) {
     bomb->Kill();
     _bombs[index] = NULL;
     _iBombCount--;
+}
+void MoveKey() {
+    bool hasMoved = false;
+    for (int y = 1; y < maxrow - 1; y++)
+    {
+        if (!hasMoved)
+        {
+            for (int x = 1; x < maxcol - 1; x++)
+            {
+                if (!hasMoved)
+                {
+                    if (map[y][x] != 0)
+                    {
+                        if (rand() % 20 == 0)
+                        {
+                            _pKeySprite->SetPosition(x * 50 + 25, y * 50 + 25);
+                            _pKeySprite->Setbfrm(240);
+                            hasMoved = true;
+                        }
+                    }
+                }
+                else
+                    break;
+                
+            }
+        }
+        
+    }
+    if (!hasMoved)
+    {
+        _pKeySprite->Setbfrm(240);
+    }
 }
