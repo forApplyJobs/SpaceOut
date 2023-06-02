@@ -56,6 +56,7 @@ int maxrow = 15, maxcol = 21;
 int **map;
 int maxwall = 54, wall;
 int maxAlien = 15;
+int level = 1;
 
 GameEngine*       _pGame;
 HDC               _hOffscreenDC;
@@ -91,7 +92,7 @@ Sprite*           _pKeySprite;
 Sprite*           _pBossSprite;
 Sprite*           _element[4];
 Bomb*             _bombs[4];
-Sprite*           _Aliens[15];
+Sprite*           _Aliens[40];
 int               _iFireInputDelay;
 int               _iNumLives, _iScore, _iDifficulty,_numOfEnemies;
 int *             _iCoordination;
