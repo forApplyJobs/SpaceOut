@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if (!GameEngine::GetEngine()->GetSleep())
         {
           // Check the tick count to see if a game cycle has elapsed
-          iTickCount = GetTickCount();
+          iTickCount = GetTickCount64();
           if (iTickCount > iTickTrigger)
           {
             iTickTrigger = iTickCount +
